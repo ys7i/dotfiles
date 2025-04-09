@@ -14,7 +14,7 @@ install_libraries() {
 }
 
 install_on_linux() {
-  echo 'nothing to instal yet'
+    wget https://github.com/gsamokovarov/jump/releases/download/v0.51.0/jump_0.51.0_amd64.deb && sudo dpkg -i jump_0.51.0_amd64.deb
 }
 
 install_on_mac() {
