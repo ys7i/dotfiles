@@ -26,4 +26,6 @@ plugins=(
 )
 
 # jump command
-eval "$(jump shell)"
+if command -v jump &> /dev/null; then
+    eval "$(jump shell)"
+fi
