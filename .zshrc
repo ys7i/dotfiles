@@ -29,3 +29,14 @@ plugins=(
 if command -v jump &> /dev/null; then
     eval "$(jump shell)"
 fi
+
+export PATH="$HOME/.rbenv/bin:$PATH"
+if [ -d "$HOME/.rbenv" ]; then
+    eval "$(rbenv init - zsh)"
+fi
+
+if [ -d "$HOME/.pyenv" ]; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+fi
