@@ -8,6 +8,18 @@ setup_dotfiles() {
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+
+  # Install jump
+  echo "Installing jump..."
+  if command -v brew &> /dev/null; then
+    brew install jump
+  elif [[ "$(uname)" == "Linux" ]]; then
+    ARCH=$(uname -m)
+    [[ "$ARCH" == "aarch64" ]] && ARCH="arm64" || ARCH="amd64"
+    JUMP_VER=$(curl -s https://api.github.com/repos/gsamokovarov/jump/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"v\([^"]*\)".*/\1/')
+    curl -sL "https://github.com/gsamokovarov/jump/releases/download/v${JUMP_VER}/jump_${JUMP_VER}_${ARCH}_linux.tar.gz" | tar -xz -C /tmp
+    sudo mv /tmp/jump /usr/local/bin/jump
+  fi
 }
 
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -66,3 +78,4 @@ if [ -d "$HOME/.pyenv" ]; then
   export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init --path)"
 fi
+export PATH="$HOME/.local/bin:$PATH"
