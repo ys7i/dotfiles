@@ -15,19 +15,19 @@ setup_dotfiles() {
     brew install jump
   elif [[ "$(uname)" == "Linux" ]]; then
     ARCH=$(uname -m)
-    [[ "$ARCH" == "aarch64" ]] && ARCH="arm64" || ARCH="amd64"
+    [[ "$ARCH" == "aarch64" ]] && ARCH="arm" || ARCH="amd64"
     JUMP_VER=$(curl -sf https://api.github.com/repos/gsamokovarov/jump/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"v\([^"]*\)".*/\1/')
     if [[ -z "$JUMP_VER" ]]; then
       echo "Failed to get jump version. Skipping jump install."
     else
-      JUMP_TMP=$(mktemp -d)
-      if curl -fsSL "https://github.com/gsamokovarov/jump/releases/download/v${JUMP_VER}/jump_${JUMP_VER}_${ARCH}_linux.tar.gz" | tar -xz -C "$JUMP_TMP"; then
-        sudo mv "$JUMP_TMP/jump" /usr/local/bin/jump
+      if curl -fsSL "https://github.com/gsamokovarov/jump/releases/download/v${JUMP_VER}/jump_linux_${ARCH}_binary" -o /tmp/jump; then
+        sudo install -m 755 /tmp/jump /usr/local/bin/jump
+        rm -f /tmp/jump
         echo "jump installed successfully."
       else
-        echo "Failed to download or extract jump."
+        echo "Failed to download jump."
+        rm -f /tmp/jump
       fi
-      rm -rf "$JUMP_TMP"
     fi
   fi
 }
