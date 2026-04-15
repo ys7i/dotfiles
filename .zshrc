@@ -4,7 +4,7 @@ setup_dotfiles() {
 
   # Install libraries
   echo "Installing oh-my-zsh and plugins..."
-  curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh -s -- --keep-zshrc
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
   git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
@@ -16,9 +16,19 @@ setup_dotfiles() {
   elif [[ "$(uname)" == "Linux" ]]; then
     ARCH=$(uname -m)
     [[ "$ARCH" == "aarch64" ]] && ARCH="arm64" || ARCH="amd64"
-    JUMP_VER=$(curl -s https://api.github.com/repos/gsamokovarov/jump/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"v\([^"]*\)".*/\1/')
-    curl -sL "https://github.com/gsamokovarov/jump/releases/download/v${JUMP_VER}/jump_${JUMP_VER}_${ARCH}_linux.tar.gz" | tar -xz -C /tmp
-    sudo mv /tmp/jump /usr/local/bin/jump
+    JUMP_VER=$(curl -sf https://api.github.com/repos/gsamokovarov/jump/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"v\([^"]*\)".*/\1/')
+    if [[ -z "$JUMP_VER" ]]; then
+      echo "Failed to get jump version. Skipping jump install."
+    else
+      JUMP_TMP=$(mktemp -d)
+      if curl -fsSL "https://github.com/gsamokovarov/jump/releases/download/v${JUMP_VER}/jump_${JUMP_VER}_${ARCH}_linux.tar.gz" | tar -xz -C "$JUMP_TMP"; then
+        sudo mv "$JUMP_TMP/jump" /usr/local/bin/jump
+        echo "jump installed successfully."
+      else
+        echo "Failed to download or extract jump."
+      fi
+      rm -rf "$JUMP_TMP"
+    fi
   fi
 }
 
@@ -79,3 +89,14 @@ if [ -d "$HOME/.pyenv" ]; then
   eval "$(pyenv init --path)"
 fi
 export PATH="$HOME/.local/bin:$PATH"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/Users/ys7i/.bun/_bun" ] && source "/Users/ys7i/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
