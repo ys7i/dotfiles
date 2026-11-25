@@ -16,7 +16,8 @@ setup_dotfiles() {
   elif [[ "$(uname)" == "Linux" ]]; then
     ARCH=$(uname -m)
     [[ "$ARCH" == "aarch64" ]] && ARCH="arm" || ARCH="amd64"
-    JUMP_VER=$(curl -sf https://api.github.com/repos/gsamokovarov/jump/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"v\([^"]*\)".*/\1/')
+    # v0.69.0 の linux amd64 配布物は中身が ARM64 で動かないため、x86_64 で動く 0.67.0 に固定（2026-11-25）
+    JUMP_VER="0.67.0"
     if [[ -z "$JUMP_VER" ]]; then
       echo "Failed to get jump version. Skipping jump install."
     else
